@@ -1,17 +1,31 @@
 on:
   workflow_dispatch:
     inputs:
-      my_value:
-        description: 'My input value'
+      name:
+        type: choice
+        description: 'Name of a container to deploy to AKS'
+        options: 
+        - game-statspubgapi
+        - game-statspubgspa
+        - secretsreader
         required: true
-        default: 'foo'
-        type: string
-
+        
 jobs:
-  my_job:
-    name: "My job [my_value: ${{ github.event.inputs.my_value }}]"
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Output Inputs
-        run: echo "${{ toJSON(github.event.inputs) }}"
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        
+        - name: 'Login via Azure CLI'
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+        - name: 'Login to Azure Registry and get container'
+          uses: azure/docker-login@v1
+          with:
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+        - run: |
+            # run: az acr repository show-tags -n bangertest --repository ${{ github.event.inputs.name }}
+            run: echo "${{ secrets.REGISTRY_LOGIN_SERVER }}"
+            run: echo "${{ toJSON(github.event.inputs) }}"
