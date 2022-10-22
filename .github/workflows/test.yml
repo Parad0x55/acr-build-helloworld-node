@@ -6,8 +6,8 @@ on:
         type: choice
         description: 'Name of a container to deploy to AKS'
         options: 
-        - game-statspubgapi
-        - game-statspubgspa
+        - gamestatspubgapi
+        - gamestatspubgspa
         - secretsreader
         - sampleapp
         required: true
