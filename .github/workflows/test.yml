@@ -26,6 +26,6 @@ jobs:
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
         - run: |
-            
-            run: echo "${{ secrets.REGISTRY_LOGIN_SERVER }}"
-            run: echo "${{ toJSON(github.event.inputs) }}"
+            az acr repository show-tags -n ${{ secrets.REGISTRY_LOGIN_SERVER }} --repository ${{ github.event.inputs.name }}
+            echo "${{ secrets.REGISTRY_LOGIN_SERVER }}"
+            echo "${{ toJSON(github.event.inputs) }}"
