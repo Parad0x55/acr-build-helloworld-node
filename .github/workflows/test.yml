@@ -40,6 +40,6 @@ jobs:
             action: deploy
             namespace: 'default'
             manifests: |
-               'deploy-${{ github.event.inputs.name }}.yaml'
+               deploy-${{ github.event.inputs.name }}.yaml
             images: |
               '${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ github.event.inputs.name }}:${{ github.event.inputs.version }}'
