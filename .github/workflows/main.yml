@@ -1,5 +1,5 @@
 on: [push]
-name: Deploy_to_AZR
+name: Deploy to AZR
 
 jobs:
     build-and-deploy:
