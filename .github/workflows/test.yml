@@ -10,6 +10,10 @@ on:
         - secretsreader
         - sampleapp
         required: true
+      version:
+        type: string
+        default: latest
+        required: false      
         
 jobs:
     build-and-deploy:
@@ -19,14 +23,21 @@ jobs:
           uses: azure/login@v1
           with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-        - name: 'Login to Azure Registry and get container'
-          uses: azure/docker-login@v1
+        - name: 'Set AKS context'
+          id: set-context
+          uses: azure/aks-set-context@v3
           with:
-            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-            username: ${{ secrets.REGISTRY_USERNAME }}
-            password: ${{ secrets.REGISTRY_PASSWORD }}
-        - run: |
-            az acr repository show-tags -n ${{ secrets.REGISTRY_LOGIN_SERVER }} --repository ${{ github.event.inputs.name }}
-            echo "${{ secrets.REGISTRY_LOGIN_SERVER }}"
-            echo "${{ toJSON(github.event.inputs) }}"
+            resource-group: '${{ secrets.resource_group }}' 
+            cluster-name: '${{ secrets.cluster_name }}'
+        - name: 'Setup kubectl'
+          id: install-kubectl
+          uses: azure/setup-kubectl@v3
+        - name: 'Deploy to AKS'
+          id: deploy-aks
+          uses: Azure/k8s-deploy@v4
+          with:
+            namespace: 'default'
+            manifests: |
+             deploy-${{ github.event.inputs.name }}.yaml
+            images: '${{ secrets.registry }}.azurecr.io/${{ secrets.repository }}/azure-vote-front:${{ github.sha }}'
+            pull: true
