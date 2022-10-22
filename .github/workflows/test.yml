@@ -8,6 +8,7 @@ on:
         - game-statspubgapi
         - game-statspubgspa
         - secretsreader
+        - sampleapp
         required: true
         
 jobs:
