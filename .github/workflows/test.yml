@@ -1,3 +1,4 @@
+name: Deploy to AKS
 on:
   workflow_dispatch:
     inputs:
@@ -13,7 +14,7 @@ on:
       version:
         type: string
         default: latest
-        required: false      
+        required: true      
         
 jobs:
     build-and-deploy:
@@ -36,8 +37,8 @@ jobs:
           id: deploy-aks
           uses: Azure/k8s-deploy@v4
           with:
+            action: deploy
             namespace: 'default'
             manifests: |
              deploy-${{ github.event.inputs.name }}.yaml
-            images: '${{ secrets.registry }}.azurecr.io/${{ secrets.repository }}/azure-vote-front:${{ github.sha }}'
-            pull: true
+            images: '${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ github.event.inputs.name }}:${{ github.event.inputs.version }}'
