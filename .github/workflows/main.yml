@@ -1,5 +1,5 @@
 on: [push]
-name: Deploy to AZR
+name: Build and Push container to AZR
 
 jobs:
     build-and-deploy:
