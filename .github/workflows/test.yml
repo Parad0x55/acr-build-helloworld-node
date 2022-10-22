@@ -40,6 +40,6 @@ jobs:
             action: deploy
             namespace: 'default'
             manifests: |
-               https://github.com/Parad0x55/acr-build-helloworld-node/blob/master/deploy-game-statspubgapi.yaml
+               deploy-${{ github.event.inputs.name }}.yaml
             images: |
               '${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ github.event.inputs.name }}:${{ github.event.inputs.version }}'
