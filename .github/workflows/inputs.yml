@@ -1,4 +1,4 @@
-ame: Mixed inputs
+Name: Mixed inputs
 
 on:
   workflow_dispatch:
