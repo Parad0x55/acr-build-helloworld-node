@@ -7,7 +7,7 @@ on:
         description: 'Name of a container to deploy to AKS'
         options: 
         - gamestatspubgapi
-        - gamestatspubgspa
+        - game-statspubgspa
         - secretsreader
         - sampleapp
         required: true
