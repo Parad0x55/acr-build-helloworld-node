@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-statspubgspa-deployment
+  labels:
+    app: game-statspubgspa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: game-statspubgspa
+  template:
+    metadata:
+      labels:
+        app: game-statspubgspa
+    spec:
+      containers:
+      - name: game-statspubgspa
+        image: bangertest.azurecr.io/game-statspubgspa:v3
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: secrets-store01-inline
+          mountPath: "/usr/share/nginx/html/settings"
+          readOnly: true    
+      volumes:
+      - name: secrets-store01-inline
+        csi:
+         driver: secrets-store.csi.k8s.io
+         readOnly: true
+         volumeAttributes:
+           secretProviderClass: "json-kv"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-statspubgspa
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+  selector:
+    app: game-statspubgspa
