@@ -1,0 +1,10 @@
+on:
+  workflow_dispatch:
+    inputs:
+      myInput:
+        default: "my input value"
+jobs:
+  myJob:
+    steps:
+      - name: Output Inputs
+        run: echo "${{ toJSON(github.event.inputs) }}"
