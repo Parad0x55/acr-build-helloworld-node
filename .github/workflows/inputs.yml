@@ -9,4 +9,4 @@ jobs:
 
     steps:
     - name: Send greeting
-      run: echo "test"
+      run: echo ${GITHUB_REF}
