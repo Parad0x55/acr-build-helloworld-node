@@ -9,4 +9,6 @@ jobs:
 
     steps:
     - name: Send greeting
-      run: echo ${GITHUB_REF}
+      run: |
+          echo ${GITHUB_REF}
+          echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`"
