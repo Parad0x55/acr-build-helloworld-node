@@ -3,7 +3,7 @@ name: Mixed inputs
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*'
 jobs:
   test:
     runs-on: ubuntu-latest
