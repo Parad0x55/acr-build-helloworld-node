@@ -1,7 +1,7 @@
 name: Mixed inputs
 
 on:
-  workflow_dispatch:
+  push:
   
 jobs:
   greet:
@@ -14,7 +14,6 @@ jobs:
       run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
     - name: Test
       run: |
-          sudo apt-get update && apt-get install -y git
           echo $RELEASE_VERSION
           echo ${{ env.RELEASE_VERSION }}
           echo ${GITHUB_REF}
