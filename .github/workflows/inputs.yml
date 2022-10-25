@@ -19,3 +19,4 @@ jobs:
           echo ${{ env.RELEASE_VERSION }}
           echo $GITHUB_ENV
           echo Test
+          echo Test2
