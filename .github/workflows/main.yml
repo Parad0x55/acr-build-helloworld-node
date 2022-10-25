@@ -8,10 +8,10 @@ jobs:
         # checkout the repo
         - name: 'Checkout GitHub Action'
           uses: actions/checkout@v2
-        - name: Set tag
+        - name: Set env
           run: |
              git fetch --prune --unshallow
-             echo "GIT_TAG=${git describe --tags --abbrev=0}" >> $GITHUB_ENV
+             echo "GIT_TAG=`echo $(git describe --tags --abbrev=0 --always)`" >> $GITHUB_ENV
                        
         - name: 'Login via Azure CLI'
           uses: azure/login@v1
