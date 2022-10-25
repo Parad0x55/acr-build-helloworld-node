@@ -8,11 +8,11 @@ jobs:
         # checkout the repo
         - name: 'Checkout GitHub Action'
           uses: actions/checkout@v2
-        - name: Set env
+        - name: Set tag
           run: |
              git fetch --prune --unshallow
-             echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
-          
+             echo "GIT_TAG=${git describe --tags --abbrev=0}" >> $GITHUB_ENV
+                       
         - name: 'Login via Azure CLI'
           uses: azure/login@v1
           with:
@@ -25,5 +25,5 @@ jobs:
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
         - run: |
-            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:latest -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:$GITHUB_ENV
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:latest -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ env.GIT_TAG }}
+            docker push --all-tags ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp
