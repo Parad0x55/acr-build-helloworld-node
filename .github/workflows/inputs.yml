@@ -11,7 +11,7 @@ jobs:
       - name: Set env
         run: |
              git fetch --prune --unshallow
-             git tag
+             git describe --tags --abbrev=0
              echo "RELEASE_VERSION=${{ github.ref_name}}" >> $GITHUB_ENV
       - name: Test
         run: |
