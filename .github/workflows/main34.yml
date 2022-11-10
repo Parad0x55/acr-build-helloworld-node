@@ -1,0 +1,34 @@
+on:
+    push:
+        tags:
+            - 'v*'
+        
+name: Build and Push PUBG container to ACR
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+        - name: 'Checkout GitHub Action'
+          uses: actions/checkout@v2
+		      with:
+			      submodules: 'true'
+            token: ${{ secrets.MY_REPO_PAT }}
+        - name: Set env
+          run: |
+             echo "RELEASE_VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
+                       
+        - name: 'Login via Azure CLI'
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+        - name: 'Build and push image'
+          uses: azure/docker-login@v1
+          with:
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+        - run: |
+            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/portallandingpage:latest -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/portallandingpage:${{ env.RELEASE_VERSION }}
+            docker push --all-tags ${{ secrets.REGISTRY_LOGIN_SERVER }}/portallandingpage
