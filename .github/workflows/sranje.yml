@@ -10,4 +10,5 @@ jobs:
           uses: actions/checkout@v2
         - name: Set env
           run: |
+            working-directory: ./test/test2
             docker build . -t brankoc/sampleapp:latest
