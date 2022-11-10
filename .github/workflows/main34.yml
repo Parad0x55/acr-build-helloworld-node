@@ -11,8 +11,8 @@ jobs:
         steps:
         - name: 'Checkout GitHub Action'
           uses: actions/checkout@v2
-		      with:
-			      submodules: 'true'
+	  with:
+	    submodules: 'true'
             token: ${{ secrets.MY_REPO_PAT }}
         - name: Set env
           run: |
