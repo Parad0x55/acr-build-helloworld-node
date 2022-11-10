@@ -1,0 +1,13 @@
+on: [push]
+name: Build and Push container to AZR
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+        # checkout the repo
+        - name: 'Checkout GitHub Action'
+          uses: actions/checkout@v2
+        - name: Set env
+          run: |
+            docker push --all-tags ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp
