@@ -1,0 +1,17 @@
+on: [push]
+name: Build and Push container to AZR
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+        # checkout the repo
+        
+        - name: 'Checkout GitHub Action'
+          uses: actions/checkout@v2
+        
+        - name: 'Build and push image'
+        - run: |
+            working-directory: ./test/test2
+            docker build . -t brankoc/sampleapp:latest
+          
