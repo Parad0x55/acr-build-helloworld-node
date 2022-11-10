@@ -9,5 +9,6 @@ jobs:
         - name: 'Checkout GitHub Action'
           uses: actions/checkout@v2
         - name: Set env
+          working-directory: ./test/test2
           run: |
             docker build . -t brankoc/sampleapp:latest
