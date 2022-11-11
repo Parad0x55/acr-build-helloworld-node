@@ -14,6 +14,13 @@ jobs:
              echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`" >> $GITHUB_ENV
              echo "RELEASE_VERSION=${{ github.ref_name}}" >> $GITHUB_ENV
              echo "APP_VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
+      - name: print secrets
+        run: |
+             echo "$MY_NUGET_CONFIG" >> config.ini
+             cat config.ini
+        shell: bash
+        env:
+             MY_NUGET_CONFIG: ${{secrets.KEY}}
       - name: Test
         run: |
           echo $RELEASE_VERSION
