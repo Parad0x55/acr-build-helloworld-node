@@ -16,12 +16,12 @@ jobs:
              echo "APP_VERSION=$(echo ${GITHUB_REF:10})" >> $GITHUB_ENV
       - name: print secrets
         run: |
-             echo "$MY_NUGET_CONFIG" >> config.ini
+             echo "$NUGET_CONFIG" >> config.ini
              cat config.ini
              ls -alh
         shell: bash
         env:
-             MY_NUGET_CONFIG: ${{secrets.KEY}}
+             NUGET_CONFIG: ${{secrets.MY_NUGET_CONFIG}}
       - name: Test
         run: |
           echo $RELEASE_VERSION
