@@ -18,6 +18,7 @@ jobs:
         run: |
              echo "$MY_NUGET_CONFIG" >> config.ini
              cat config.ini
+             ls -alh
         shell: bash
         env:
              MY_NUGET_CONFIG: ${{secrets.KEY}}
