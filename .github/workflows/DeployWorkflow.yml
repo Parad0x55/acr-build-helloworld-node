@@ -1,0 +1,72 @@
+name: Deploy Workflow
+on:
+  workflow_call:
+    inputs:
+      deployment-type:
+        required: true
+        type: string
+        description: 'Must be either development, staging or production'
+      images_input:
+        required: true
+        type: string
+      manifests_input:
+        required: true
+        type: string
+      namespace:
+        required: true
+        type: string
+ 
+jobs:
+   reusable_workflow_job:
+    runs-on: ubuntu-latest
+    env:
+       RESOURCE_GROUP: "${{ inputs.deployment-type == 'production' && secrets.RESOURCE_GROUP_PROD || (inputs.deployment-type == 'staging' && secrets.RESOURCE_GROUP_STAG || secrets.RESOURCE_GROUP_DEV )}}"
+       CLUSTER_NAME: "${{ inputs.deployment-type == 'production' && secrets.CLUSTER_NAME_PROD || (inputs.deployment-type == 'staging' && secrets.CLUSTER_NAME_STAG || secrets.CLUSTER_NAME_DEV )}}"
+       SLACK_COLOR: "${{ inputs.deployment-type == 'production' && '#FF0000' || (inputs.deployment-type == 'staging' && '#e6961e' || '#0e9925' )}}"
+    steps:
+      - name: Checkout source code 
+        uses: actions/checkout@v3
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Set AKS context'
+        id: set-context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: '${{ env.RESOURCE_GROUP }}' 
+          cluster-name: '${{ env.CLUSTER_NAME }}'
+      - name: 'Setup kubectl'
+        id: install-kubectl
+        uses: azure/setup-kubectl@v3
+      - name: 'Prepare deploy to AKS'  
+        run: |
+          echo 'IMAGE_RESULT<<EOF' >> $GITHUB_ENV
+          echo "${{inputs.images_input}}" | sed -n  'H;${x;s/ /\n/g;s/^\n//;p;}' | sed 's#^#${{ secrets.REGISTRY_LOGIN_SERVER }}/#' | sed 's#$#:${{ github.event.inputs.version }}#'  >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+          echo 'MANIFESTS_RESULT<<EOF' >> $GITHUB_ENV
+          echo "${{inputs.manifests_input}}" | sed -n  'H;${x;s/ /\n/g;s/^\n//;p;}' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+      - name: print input parsing results
+        run: |
+           echo "${{env.IMAGE_RESULT}}"
+           echo "${{env.MANIFESTS_RESULT}}"
+      - name: 'Deploy to AKS'
+        id: deploy-aks
+        uses: Azure/k8s-deploy@v4
+        with:
+          namespace: "${{inputs.namespace}}"
+          manifests: |
+             ${{env.MANIFESTS_RESULT}}
+          images: |
+             ${{env.IMAGE_RESULT}}
+      - name: Add summary
+        run: |
+           echo "# ${{ github.event.inputs.Environment }}/${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_COLOR: ${{ env.SLACK_COLOR }}
+          SLACK_TITLE: "${{inputs.deployment-type}} deployment"
+          SLACK_MESSAGE: "Deployment job status: ${{ job.status }}"
