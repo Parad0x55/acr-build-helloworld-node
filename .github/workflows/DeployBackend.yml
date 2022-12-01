@@ -1,0 +1,76 @@
+name: Deploy Backend to AKS
+on:
+  workflow_dispatch:
+    inputs:
+      Version:
+        description: 'Version'
+        type: string
+        default: latest
+        required: true
+      Environment:
+        type: choice
+        description: 'Environment'
+        options: 
+        - Development
+        - Staging
+        - Production
+        required: true
+      Verification:
+        type: string
+        required: false
+        description: 'Verification'
+env:
+   IMAGE_BASE:
+     portal_backend_echo
+     portal_backend
+     portal_backend
+   MANIFESTS:
+     backend/backend-echo-deployment.yaml
+     backend/backend-portal-deployment.yaml
+     backend/backend-worker-deployment.yaml
+   NAMESPACE: 'backend'   
+jobs:
+    envSetup:
+      name: Setup Dynamic Environment Variables
+      runs-on: ubuntu-latest
+      outputs:
+        images_input: ${{ steps.set-output-defaults.outputs.images_input }}
+        manifests_input: ${{ steps.set-output-defaults.outputs.manifests_input }}
+        namespace_input: ${{ steps.set-output-defaults.outputs.namespace_input }}
+      steps:
+        - name: set outputs with default values
+          id: set-output-defaults
+          run: |    
+            echo "::set-output name=images_input::${{ env.IMAGE_BASE }}"
+            echo "::set-output name=manifests_input::${{ env.MANIFESTS }}"
+            echo "::set-output name=namespace_input::${{ env.NAMESPACE }}"
+    development-deploy:
+        needs: envSetup
+        if: ${{ github.event.inputs.Environment == 'Development' }}
+        uses: ./.github/workflows/DeployWorkflow.yml
+        with:
+         deployment-type: 'development'
+         images_input: ${{needs.envSetup.outputs.images_input}}
+         manifests_input: ${{needs.envSetup.outputs.manifests_input}}
+         namespace: ${{needs.envSetup.outputs.namespace_input}}
+        secrets: inherit
+    staging-deploy:
+        needs: envSetup
+        if: ${{ github.event.inputs.Environment == 'Staging' }}
+        uses: ./.github/workflows/DeployWorkflow.yml
+        with:
+         deployment-type: 'staging'
+         images_input: ${{needs.envSetup.outputs.images_input}}
+         manifests_input: ${{needs.envSetup.outputs.manifests_input}}
+         namespace: ${{needs.envSetup.outputs.namespace_input}}
+        secrets: inherit
+    production-deploy:
+        needs: envSetup
+        if: ${{ github.event.inputs.Environment == 'Production' && github.event.inputs.Verification == 'production' }}
+        uses: ./.github/workflows/DeployWorkflow.yml
+        with:
+         deployment-type: 'production'
+         images_input: ${{needs.envSetup.outputs.images_input}}
+         manifests_input: ${{needs.envSetup.outputs.manifests_input}}
+         namespace: ${{needs.envSetup.outputs.namespace_input}}
+        secrets: inherit
