@@ -5,9 +5,12 @@ jobs:
   build:
     name: Build Docker
     runs-on: self-hosted
-    #env:
-    #  DOTNET_INSTALL_DIR: "./.dotnet"
+    env:
+      DOTNET_INSTALL_DIR: "./.dotnet"
     steps:
+    - name: Install a SQL Server suite of tools
+      run: |
+        sudo docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=${{ env.GH_TEST_SQL_SA_PASSWORD }}" -e "MSSQL_COLLATION=SQL_Latin1_General_CP1_CI_AS" --name sql -p 1433:1433 -d "mcr.microsoft.com/mssql/server:2019-latest"
     - name: Checkout
       uses: actions/checkout@v2
 
