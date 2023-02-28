@@ -5,8 +5,8 @@ jobs:
   build:
     name: Build Docker
     runs-on: self-hosted
-    env:
-      DOTNET_INSTALL_DIR: "./.dotnet"
+    #env:
+    #  DOTNET_INSTALL_DIR: "./.dotnet"
     steps:
     - name: Checkout
       uses: actions/checkout@v2
